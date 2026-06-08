@@ -154,7 +154,9 @@ describe('FlightPlanListComponent - Property Tests', () => {
           photoCount: fc.integer({ min: 0, max: 10000 }),
           coveredAreaM2: fc.double({ min: 0, max: 1000000, noNaN: true }),
         }),
-        createdAt: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map((d) => d.toISOString()),
+        createdAt: fc
+          .integer({ min: new Date('2020-01-01T00:00:00.000Z').getTime(), max: new Date('2030-12-31T23:59:59.999Z').getTime() })
+          .map((ts) => new Date(ts).toISOString()),
       });
 
       let iteration = 0;
