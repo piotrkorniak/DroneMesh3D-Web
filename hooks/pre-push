@@ -1,0 +1,17 @@
+#!/bin/sh
+# Pre-push hook: build + tests
+# Runs before pushing to catch broken code before it hits CI.
+
+set -e
+
+echo "=== Pre-push: Build ==="
+
+echo "Building Angular app..."
+npx ng build --configuration production
+
+echo "=== Pre-push: Tests ==="
+
+echo "Running Angular tests..."
+npx ng test --watch=false --browsers=ChromeHeadless
+
+echo "=== Pre-push: All checks passed ==="

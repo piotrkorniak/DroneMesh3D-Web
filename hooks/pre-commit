@@ -1,0 +1,21 @@
+#!/bin/sh
+# Pre-commit hook: auto-format + lint
+# Install: git config core.hooksPath hooks (auto-installed by npm install)
+
+set -e
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|html|scss|json|md|yml|yaml)$' || true)
+
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+# Auto-format staged files and re-stage them
+echo "$STAGED" | xargs npx prettier --write
+echo "$STAGED" | xargs git add
+
+# Lint TS/HTML
+STAGED_TS=$(echo "$STAGED" | grep -E '\.(ts|html)$' || true)
+if [ -n "$STAGED_TS" ]; then
+  echo "$STAGED_TS" | xargs npx eslint --max-warnings=0
+fi
