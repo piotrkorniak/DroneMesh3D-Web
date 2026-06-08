@@ -1,54 +1,54 @@
 # DroneMesh3D Web
 
-Angular frontend for DroneMesh3D — a drone flight path planning application with interactive map-based area definition and mission file generation.
+Frontend Angular do aplikacji DroneMesh3D — planowanie tras lotów dronów z interaktywną mapą, definiowaniem obszarów i generowaniem plików misji.
 
-## Prerequisites
+## Wymagania
 
 - Node.js 22+
 - npm 10+
-- Chrome/Chromium (for headless tests)
+- Chrome/Chromium (do testów headless)
 
-## Getting Started
+## Start
 
 ```bash
 npm install
 npm start
 ```
 
-Open `http://localhost:4200/`. The app proxies `/api` requests to `http://localhost:5000` (the .NET backend).
+Aplikacja pod `http://localhost:4200/`. Requesty `/api` są proxy'owane do backendu (`localhost:5000`).
 
-## Available Scripts
+## Skrypty
 
-| Script | Description |
-|--------|-------------|
-| `npm start` | Start dev server with API proxy |
-| `npm run build` | Production build |
-| `npm run test` | Run unit tests (Karma + Jasmine) |
-| `npm run lint` | ESLint check |
-| `npm run format` | Format code with Prettier |
-| `npm run format:check` | Verify formatting |
-| `npm run api:generate` | Regenerate API client from OpenAPI spec |
+| Skrypt | Opis |
+|--------|------|
+| `npm start` | Dev server z proxy do API |
+| `npm run build` | Build produkcyjny |
+| `npm run test` | Testy jednostkowe (Karma + Jasmine) |
+| `npm run lint` | Sprawdzenie ESLint |
+| `npm run format` | Formatowanie Prettierem |
+| `npm run format:check` | Weryfikacja formatowania |
+| `npm run api:generate` | Regeneracja klienta API z OpenAPI |
 
-## API Client Generation
+## Generowanie klienta API
 
-The typed Angular HTTP client is auto-generated from the backend's OpenAPI spec:
+Typowany klient HTTP jest generowany z OpenAPI spec backendu:
 
 ```bash
-# Ensure the API is running on localhost:5000
+# Backend musi działać na localhost:5000
 npm run api:generate
 ```
 
-Generated files live in `src/app/api/` and are excluded from Prettier formatting.
+Wygenerowane pliki w `src/app/api/` — wyłączone z formatowania Prettier.
 
 ## Docker
 
-### Production
+### Produkcja
 
 ```bash
 docker build -t dronemesh3d-web .
 ```
 
-Uses multi-stage build (Node → Nginx). The Nginx config handles SPA routing and proxies `/api/` to the backend service.
+Multi-stage build (Node → Nginx). Nginx obsługuje SPA routing i proxy `/api/` do backendu.
 
 ### Development (Docker Compose)
 
@@ -56,35 +56,35 @@ Uses multi-stage build (Node → Nginx). The Nginx config handles SPA routing an
 docker compose up
 ```
 
-The dev container serves Angular with hot-reload and proxies API calls to the `api` service.
+Kontener dev serwuje Angular z hot-reload i proxy'uje `/api` do serwisu `api`.
 
 ## Git Hooks
 
-Hooks are auto-configured via `npm install` (sets `core.hooksPath` to `hooks/`):
+Konfigurowane automatycznie przez `npm install` (ustawia `core.hooksPath` na `hooks/`):
 
-- **pre-commit**: Auto-formats staged files with Prettier, then lints TS/HTML with ESLint
-- **pre-push**: Runs production build + tests to catch issues before CI
+- **pre-commit**: Auto-format staged plików Prettierem + lint ESLint
+- **pre-push**: Build produkcyjny + testy (łapie problemy przed CI)
 
-## Project Structure
+## Struktura projektu
 
 ```
 src/
 ├── app/
-│   ├── api/            # Auto-generated API client (OpenAPI)
-│   ├── components/     # UI components (map, panels, dialogs)
-│   ├── directives/     # Custom directives (focus trap, keyboard nav)
-│   ├── models/         # TypeScript interfaces
+│   ├── api/            # Auto-generowany klient API (OpenAPI)
+│   ├── components/     # Komponenty UI (mapa, panele, dialogi)
+│   ├── directives/     # Dyrektywy (focus trap, nawigacja klawiaturą)
+│   ├── models/         # Interfejsy TypeScript
 │   ├── pipes/          # Custom pipes
-│   ├── services/       # Business logic services
-│   └── utils/          # Utility functions
-├── styles/             # Global SCSS (tokens, accessibility, responsive)
+│   ├── services/       # Logika biznesowa
+│   └── utils/          # Funkcje pomocnicze
+├── styles/             # Globalne SCSS (tokeny, accessibility, responsive)
 └── index.html
 ```
 
-## Tech Stack
+## Stack
 
 - Angular 21
-- OpenLayers (interactive maps)
+- OpenLayers (mapy)
 - RxJS
 - Karma + Jasmine + fast-check (property-based testing)
 - ESLint + Prettier
