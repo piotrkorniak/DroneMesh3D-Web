@@ -1,62 +1,91 @@
-# Dronemesh3dFrontend
+# DroneMesh3D Web
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.27.
+Angular frontend for DroneMesh3D — a drone flight path planning application with interactive map-based area definition and mission file generation.
 
-## Development server
+## Prerequisites
 
-To start a local development server, run:
+- Node.js 22+
+- npm 10+
+- Chrome/Chromium (for headless tests)
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the
-source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Getting Started
 
 ```bash
-ng generate component component-name
+npm install
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open `http://localhost:4200/`. The app proxies `/api` requests to `http://localhost:5000` (the .NET backend).
+
+## Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm start` | Start dev server with API proxy |
+| `npm run build` | Production build |
+| `npm run test` | Run unit tests (Karma + Jasmine) |
+| `npm run lint` | ESLint check |
+| `npm run format` | Format code with Prettier |
+| `npm run format:check` | Verify formatting |
+| `npm run api:generate` | Regenerate API client from OpenAPI spec |
+
+## API Client Generation
+
+The typed Angular HTTP client is auto-generated from the backend's OpenAPI spec:
 
 ```bash
-ng generate --help
+# Ensure the API is running on localhost:5000
+npm run api:generate
 ```
 
-## Building
+Generated files live in `src/app/api/` and are excluded from Prettier formatting.
 
-To build the project run:
+## Docker
+
+### Production
 
 ```bash
-ng build
+docker build -t dronemesh3d-web .
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for
-performance and speed.
+Uses multi-stage build (Node → Nginx). The Nginx config handles SPA routing and proxies `/api/` to the backend service.
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Development (Docker Compose)
 
 ```bash
-ng test
+docker compose up
 ```
 
-## Running end-to-end tests
+The dev container serves Angular with hot-reload and proxies API calls to the `api` service.
 
-For end-to-end (e2e) testing, run:
+## Git Hooks
 
-```bash
-ng e2e
+Hooks are auto-configured via `npm install` (sets `core.hooksPath` to `hooks/`):
+
+- **pre-commit**: Auto-formats staged files with Prettier, then lints TS/HTML with ESLint
+- **pre-push**: Runs production build + tests to catch issues before CI
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/            # Auto-generated API client (OpenAPI)
+│   ├── components/     # UI components (map, panels, dialogs)
+│   ├── directives/     # Custom directives (focus trap, keyboard nav)
+│   ├── models/         # TypeScript interfaces
+│   ├── pipes/          # Custom pipes
+│   ├── services/       # Business logic services
+│   └── utils/          # Utility functions
+├── styles/             # Global SCSS (tokens, accessibility, responsive)
+└── index.html
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Tech Stack
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the
-[Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Angular 21
+- OpenLayers (interactive maps)
+- RxJS
+- Karma + Jasmine + fast-check (property-based testing)
+- ESLint + Prettier
+- Docker + Nginx
