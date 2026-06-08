@@ -19,15 +19,15 @@ Aplikacja pod `http://localhost:4200/`. Requesty `/api` są proxy'owane do backe
 
 ## Skrypty
 
-| Skrypt | Opis |
-|--------|------|
-| `npm start` | Dev server z proxy do API |
-| `npm run build` | Build produkcyjny |
-| `npm run test` | Testy jednostkowe (Karma + Jasmine) |
-| `npm run lint` | Sprawdzenie ESLint |
-| `npm run format` | Formatowanie Prettierem |
-| `npm run format:check` | Weryfikacja formatowania |
-| `npm run api:generate` | Regeneracja klienta API z OpenAPI |
+| Skrypt                 | Opis                                |
+| ---------------------- | ----------------------------------- |
+| `npm start`            | Dev server z proxy do API           |
+| `npm run build`        | Build produkcyjny                   |
+| `npm run test`         | Testy jednostkowe (Karma + Jasmine) |
+| `npm run lint`         | Sprawdzenie ESLint                  |
+| `npm run format`       | Formatowanie Prettierem             |
+| `npm run format:check` | Weryfikacja formatowania            |
+| `npm run api:generate` | Regeneracja klienta API z OpenAPI   |
 
 ## Generowanie klienta API
 
