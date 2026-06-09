@@ -37,6 +37,8 @@ export class MapSearchComponent {
   private readonly searchSubject = new Subject<string>();
   readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
+  private isSelectingResult = false;
+
   constructor() {
     this.searchSubject
       .pipe(
@@ -91,6 +93,7 @@ export class MapSearchComponent {
   }
 
   selectResult(result: NominatimResult): void {
+    this.isSelectingResult = false;
     const lat = parseFloat(result.lat);
     const lon = parseFloat(result.lon);
     const name = result.name || result.display_name.split(',')[0];
@@ -106,8 +109,13 @@ export class MapSearchComponent {
     }
   }
 
+  onResultMousedown(): void {
+    this.isSelectingResult = true;
+  }
+
   onBlur(): void {
-    // Delay to allow click on result to fire first
+    // Don't close dropdown if user is clicking a result
+    if (this.isSelectingResult) return;
     setTimeout(() => this.showDropdown.set(false), 200);
   }
 

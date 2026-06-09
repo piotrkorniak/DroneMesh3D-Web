@@ -30,6 +30,7 @@
           role="option"
           [attr.aria-selected]="false"
           tabindex="0"
+          (mousedown)="onResultMousedown()"
           (click)="selectResult(result)"
           (keydown.enter)="selectResult(result)"
         >
