@@ -1,3 +1,12 @@
+<!-- Mobile FAB trigger -->
+@if (isMobile() && !panelState.isExpanded()) {
+  <button class="side-panel__fab side-panel__fab--mobile" type="button" aria-label="Otwórz panel" (click)="panelState.expand()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
+}
+
 <!-- Mobile backdrop -->
 @if (isMobileOverlayVisible()) {
   <div class="side-panel__backdrop" (click)="closeMobileOverlay()" aria-hidden="true"></div>

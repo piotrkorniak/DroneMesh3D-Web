@@ -128,3 +128,17 @@
     animation: none;
   }
 }
+
+/* Mobile touch targets */
+@media (max-width: 767px) {
+  .area-toolbar__btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: var(--ds-spacing-sm) var(--ds-spacing-md);
+    font-size: var(--ds-font-size-md);
+  }
+
+  .area-toolbar__actions {
+    gap: var(--ds-spacing-sm);
+  }
+}

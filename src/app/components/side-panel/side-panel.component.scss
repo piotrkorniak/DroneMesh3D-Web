@@ -1,5 +1,13 @@
 :host {
   display: contents;
+  pointer-events: none;
+}
+
+/* All interactive children get pointer-events back */
+.side-panel__backdrop,
+.side-panel__fab,
+.side-panel {
+  pointer-events: auto;
 }
 
 /* Backdrop for mobile overlay */
@@ -43,6 +51,23 @@
   outline-offset: 2px;
 }
 
+/* Mobile FAB — bottom-left to not overlap map-search */
+.side-panel__fab--mobile {
+  top: auto;
+  bottom: 16px;
+  left: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--ds-radius-xl);
+  box-shadow: var(--ds-shadow-lg);
+  background: var(--ds-color-primary);
+  color: var(--ds-color-background);
+}
+
+.side-panel__fab--mobile:hover {
+  background: var(--ds-color-primary-hover);
+}
+
 /* Main panel */
 .side-panel {
   display: flex;
@@ -67,19 +92,30 @@
   width: 48px;
 }
 
-/* Mobile mode */
+/* Mobile mode — bottom sheet style */
 .side-panel--mobile {
   position: fixed;
-  top: 0;
+  top: auto;
   left: 0;
+  right: 0;
   bottom: 0;
   width: 100% !important;
-  transform: translateX(-100%);
+  max-height: 85vh;
+  max-height: 85dvh;
+  border-right: none;
+  border-top: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-xl) var(--ds-radius-xl) 0 0;
+  transform: translateY(100%);
   transition: transform 300ms ease;
 }
 
 .side-panel--mobile.side-panel--visible {
-  transform: translateX(0);
+  transform: translateY(0);
+}
+
+/* Hide the desktop toggle on mobile — use X button instead */
+.side-panel--mobile .side-panel__toggle {
+  display: none;
 }
 
 /* Tablet mode */
@@ -104,6 +140,34 @@
   padding: var(--ds-spacing-sm);
   border-bottom: 1px solid var(--ds-color-border);
   min-height: 48px;
+}
+
+/* Mobile header: drag handle indicator */
+.side-panel--mobile .side-panel__header {
+  flex-direction: column;
+  padding-top: var(--ds-spacing-xs);
+  padding-bottom: var(--ds-spacing-sm);
+
+  &::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--ds-color-border);
+    border-radius: 2px;
+    margin-bottom: var(--ds-spacing-xs);
+  }
+}
+
+/* Mobile: close button row */
+.side-panel--mobile .side-panel__header {
+  position: relative;
+}
+
+.side-panel--mobile .side-panel__close {
+  position: absolute;
+  top: var(--ds-spacing-xs);
+  right: var(--ds-spacing-xs);
 }
 
 .side-panel__toggle {
@@ -165,6 +229,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Sections */

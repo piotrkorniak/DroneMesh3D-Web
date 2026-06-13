@@ -13,4 +13,8 @@ body {
   font-family: var(--ds-font-family);
   background-color: var(--ds-color-background);
   color: var(--ds-color-text-primary);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  /* Prevent pull-to-refresh on mobile */
+  overscroll-behavior: none;
 }

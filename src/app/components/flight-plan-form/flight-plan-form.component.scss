@@ -392,3 +392,52 @@
     border-right-color: currentColor;
   }
 }
+
+/* Mobile touch optimizations */
+@media (max-width: 767px) {
+  .fpf__compass {
+    gap: var(--ds-spacing-xs);
+  }
+
+  .fpf__compass-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: var(--ds-spacing-sm);
+    font-size: var(--ds-font-size-sm);
+  }
+
+  .fpf__input {
+    min-height: 44px;
+    padding: var(--ds-spacing-sm) var(--ds-spacing-md);
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  .fpf__select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .fpf__slider {
+    height: 8px;
+
+    &::-webkit-slider-thumb {
+      width: 24px;
+      height: 24px;
+    }
+
+    &::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .fpf__submit {
+    min-height: 48px;
+    font-size: var(--ds-font-size-md);
+  }
+
+  .fpf__mode-btn {
+    min-height: 44px;
+    font-size: var(--ds-font-size-md);
+  }
+}
