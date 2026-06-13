@@ -51,6 +51,8 @@ describe('AreaListComponent - Property Tests', () => {
         const area: AreaResponse = {
           id: areaId,
           createdAt: '2024-01-01T00:00:00Z',
+      name: null,
+      sequentialNumber: 1,
           geometry: {
             type: 'Polygon',
             coordinates: [

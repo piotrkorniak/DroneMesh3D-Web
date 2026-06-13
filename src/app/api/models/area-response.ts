@@ -12,4 +12,6 @@ export interface AreaResponse {
   id: string;
   createdAt: string;
   geometry: GeoJsonGeometry;
+  name: string | null;
+  sequentialNumber: number;
 }

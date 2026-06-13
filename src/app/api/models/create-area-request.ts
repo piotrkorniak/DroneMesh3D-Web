@@ -6,4 +6,5 @@
 export interface CreateAreaRequest {
   type: string;
   coordinates: number[][][];
+  name?: string | null;
 }

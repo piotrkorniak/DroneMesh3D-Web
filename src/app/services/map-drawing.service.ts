@@ -76,6 +76,9 @@ export class MapDrawingService {
     this.validationResult.set(result);
   }
 
+  /** Name to assign to the next area */
+  readonly areaName = signal<string>('');
+
   /** Submit the drawn polygon as a new area */
   submitArea(): Observable<AreaResponse> {
     const coords = this.drawnCoordinates();
@@ -83,23 +86,23 @@ export class MapDrawingService {
       throw new Error('No polygon coordinates to submit');
     }
 
+    const name = this.areaName().trim() || null;
     const request: CreateAreaRequest = {
       type: 'Polygon',
       coordinates: [coords],
+      name,
     };
 
     this.isSubmitting.set(true);
 
     return this.areasApi.createArea({ body: request }).pipe(
       tap((response) => {
-        // Prepend the new area to the cached list
         this.selectionState.areas.update((areas) => [response, ...areas]);
-        // Select the newly created area
         this.selectionState.selectArea(response.id);
-        // Reset drawing state
         this.hasPolygon.set(false);
         this.drawnCoordinates.set(null);
         this.validationResult.set(null);
+        this.areaName.set('');
       }),
       finalize(() => this.isSubmitting.set(false)),
     );

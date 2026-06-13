@@ -20,6 +20,8 @@ describe('AreaListComponent', () => {
     {
       id: 'area-1',
       createdAt: '2024-01-15T10:00:00Z',
+      name: null,
+      sequentialNumber: 1,
       geometry: {
         type: 'Polygon',
         coordinates: [
@@ -36,6 +38,8 @@ describe('AreaListComponent', () => {
     {
       id: 'area-2',
       createdAt: '2024-01-16T12:00:00Z',
+      name: null,
+      sequentialNumber: 1,
       geometry: {
         type: 'Polygon',
         coordinates: [
@@ -52,6 +56,8 @@ describe('AreaListComponent', () => {
     {
       id: 'area-3',
       createdAt: '2024-01-14T08:00:00Z',
+      name: null,
+      sequentialNumber: 1,
       geometry: {
         type: 'Polygon',
         coordinates: [

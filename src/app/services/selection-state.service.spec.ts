@@ -94,6 +94,8 @@ describe('SelectionStateService', () => {
       {
         id: 'area-1',
         createdAt: '2024-01-01T00:00:00Z',
+        name: null,
+        sequentialNumber: 1,
         geometry: {
           type: 'Polygon',
           coordinates: [
@@ -109,6 +111,8 @@ describe('SelectionStateService', () => {
       {
         id: 'area-2',
         createdAt: '2024-01-02T00:00:00Z',
+        name: null,
+        sequentialNumber: 2,
         geometry: {
           type: 'Polygon',
           coordinates: [

@@ -13,4 +13,6 @@ export interface PoiModeParametersDto {
   overlapPercent: number | null;
   cameraHorizontalFovDegrees: number | null;
   structureHeightM: number | null;
+  orbitShape?: string | null;
+  areaCoordinates?: number[][] | null;
 }

@@ -45,7 +45,7 @@
             (keydown.enter)="selectArea(item.area.id, item.index)"
             (keydown.space)="selectArea(item.area.id, item.index)"
           >
-            <span class="area-list__number">{{ item.index + 1 }}.</span>
+            <span class="area-list__name">{{ getAreaLabel(item.area) }}</span>
             <span class="area-list__date">{{ item.area.createdAt | relativeTime }}</span>
             <span class="area-list__hectares">{{ getHectares(item.area) }} ha</span>
             <button class="area-list__delete-btn" tabindex="0" aria-label="Usuń obszar" (click)="onDeleteClick(item.area, $event)">✕</button>
@@ -66,7 +66,20 @@
           (keydown.enter)="selectArea(area.id, i)"
           (keydown.space)="selectArea(area.id, i)"
         >
-          <span class="area-list__number">{{ i + 1 }}.</span>
+          @if (editingAreaId() === area.id) {
+            <input
+              class="area-list__name-input"
+              type="text"
+              maxlength="50"
+              [ngModel]="editingName()"
+              (ngModelChange)="editingName.set($event)"
+              (keydown)="onEditKeydown($event, area)"
+              (blur)="saveEdit(area)"
+              (click)="$event.stopPropagation()"
+            />
+          } @else {
+            <span class="area-list__name" (dblclick)="startEditing(area, $event)">{{ getAreaLabel(area) }}</span>
+          }
           <span class="area-list__date">{{ area.createdAt | relativeTime }}</span>
           <span class="area-list__hectares">{{ getHectares(area) }} ha</span>
           <button class="area-list__delete-btn" tabindex="0" aria-label="Usuń obszar" (click)="onDeleteClick(area, $event)">✕</button>

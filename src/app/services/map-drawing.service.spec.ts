@@ -237,6 +237,8 @@ describe('MapDrawingService', () => {
     const mockResponse: AreaResponse = {
       id: 'new-area-1',
       createdAt: '2024-01-01T00:00:00Z',
+      name: null,
+      sequentialNumber: 1,
       geometry: { type: 'Polygon', coordinates: [[validCoords]] as unknown as number[][][] },
     };
 

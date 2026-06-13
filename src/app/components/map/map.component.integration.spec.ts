@@ -80,6 +80,8 @@ describe('MapComponent Integration (end-to-end flow via MapDrawingService)', () 
     const mockResponse: AreaResponse = {
       id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
       createdAt: '2026-06-04T10:30:00Z',
+      name: null,
+      sequentialNumber: 1,
       geometry: {
         type: 'Polygon',
         coordinates: [validCoords4326],

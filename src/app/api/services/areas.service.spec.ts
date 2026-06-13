@@ -33,6 +33,8 @@ describe('AreasApiService', () => {
         {
           id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           createdAt: '2026-06-04T12:00:00Z',
+      name: null,
+      sequentialNumber: 1,
           geometry: {
             type: 'Polygon',
             coordinates: [
@@ -49,6 +51,8 @@ describe('AreasApiService', () => {
         {
           id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
           createdAt: '2026-06-03T08:00:00Z',
+      name: null,
+      sequentialNumber: 1,
           geometry: {
             type: 'Polygon',
             coordinates: [

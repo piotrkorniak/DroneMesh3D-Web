@@ -11,13 +11,17 @@ import { fromLonLat, toLonLat } from 'ol/proj';
 import { boundingExtent } from 'ol/extent';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
+import Point from 'ol/geom/Point';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
+import CircleStyle from 'ol/style/Circle';
 
 import { SelectionStateService } from '../../services/selection-state.service';
 import { FlightPathVisualizationService } from '../../services/flight-path-visualization.service';
 import { MapDrawingService } from '../../services/map-drawing.service';
+import { PoiStateService } from '../../services/poi-state.service';
+import { OrbitPreviewService } from '../../services/orbit-preview.service';
 import { MapSearchComponent, LocationSelectedEvent } from '../map-search/map-search.component';
 
 @Component({
@@ -32,12 +36,18 @@ export class MapComponent implements OnInit, OnDestroy {
   private readonly selectionState = inject(SelectionStateService);
   private readonly flightPathViz = inject(FlightPathVisualizationService);
   private readonly mapDrawingService = inject(MapDrawingService);
+  private readonly poiState = inject(PoiStateService);
+  private readonly orbitPreview = inject(OrbitPreviewService);
 
   private map!: Map;
   readonly vectorSource = new VectorSource();
   readonly vectorLayer = new VectorLayer({ source: this.vectorSource });
   private drawInteraction: Draw | null = null;
   private modifyInteraction: Modify | null = null;
+
+  /** POI overlay layer for center marker and orbit preview */
+  private readonly poiSource = new VectorSource();
+  private readonly poiLayer = new VectorLayer({ source: this.poiSource, zIndex: 5 });
 
   // Validation visual feedback styles
   private readonly validStyle = new Style({
@@ -137,6 +147,7 @@ export class MapComponent implements OnInit, OnDestroy {
           source: new OSM(),
         }),
         this.vectorLayer,
+        this.poiLayer,
         this.flightPathViz.flightPathLayer,
       ],
       view: new View({
@@ -148,7 +159,49 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // Provide the map view reference to FlightPathVisualizationService
     this.flightPathViz.setMapView(this.map.getView());
+
+    // POI click listener
+    this.map.on('singleclick', (evt) => {
+      if (!this.poiState.isPoiModeActive() || !this.selectionState.selectedAreaId()) return;
+      if (this.mapDrawingService.isDrawing()) return;
+      const [lon, lat] = toLonLat(evt.coordinate);
+      this.poiState.setCenterFromMap(lat, lon);
+    });
   }
+
+  // POI center marker effect
+  private readonly poiCenterEffect = effect(() => {
+    this.poiSource.clear();
+    const coords = this.poiState.centerCoords();
+    if (!coords || !this.poiState.isPoiModeActive()) return;
+
+    const [lat, lon] = coords;
+    const projected = fromLonLat([lon, lat]);
+    const marker = new Feature({ geometry: new Point(projected) });
+    marker.setStyle(
+      new Style({
+        image: new CircleStyle({
+          radius: 8,
+          fill: new Fill({ color: '#EF4444' }),
+          stroke: new Stroke({ color: '#ffffff', width: 2 }),
+        }),
+      }),
+    );
+    this.poiSource.addFeature(marker);
+
+    // Orbit preview
+    const previewCoords = this.orbitPreview.projectedCoordinates();
+    if (previewCoords && previewCoords.length > 2) {
+      const orbitFeature = new Feature({ geometry: new Polygon([previewCoords]) });
+      orbitFeature.setStyle(
+        new Style({
+          stroke: new Stroke({ color: 'rgba(59, 130, 246, 0.6)', width: 2, lineDash: [8, 8] }),
+          fill: new Fill({ color: 'rgba(59, 130, 246, 0.05)' }),
+        }),
+      );
+      this.poiSource.addFeature(orbitFeature);
+    }
+  });
 
   private addDrawInteraction(): void {
     // Clear any existing features and interactions
