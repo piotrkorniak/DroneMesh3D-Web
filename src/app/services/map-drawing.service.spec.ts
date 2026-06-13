@@ -267,6 +267,7 @@ describe('MapDrawingService', () => {
         body: {
           type: 'Polygon',
           coordinates: [validCoords],
+          name: null,
         },
       });
     });

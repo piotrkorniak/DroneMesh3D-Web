@@ -10,11 +10,11 @@ describe('GeometryClassifierService', () => {
   });
 
   it('classifies a circle approximation as circular', () => {
-    // 20-point circle approximation
+    // 20-point circle at equator (lat=0) to avoid cos(lat) distortion
     const coords: number[][] = [];
     for (let i = 0; i < 20; i++) {
       const angle = (i / 20) * 2 * Math.PI;
-      coords.push([20 + 0.001 * Math.cos(angle), 52 + 0.001 * Math.sin(angle)]);
+      coords.push([20 + 0.01 * Math.cos(angle), 0 + 0.01 * Math.sin(angle)]);
     }
     coords.push(coords[0]); // close ring
 

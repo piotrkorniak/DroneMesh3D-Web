@@ -120,11 +120,11 @@ describe('AreaListComponent', () => {
       expect(items.length).toBe(3);
     });
 
-    it('should display sequential number on each area item', () => {
-      const numbers = fixture.nativeElement.querySelectorAll('.area-list__number');
-      expect(numbers[0].textContent.trim()).toBe('1.');
-      expect(numbers[1].textContent.trim()).toBe('2.');
-      expect(numbers[2].textContent.trim()).toBe('3.');
+    it('should display area name on each area item', () => {
+      const names = fixture.nativeElement.querySelectorAll('.area-list__name');
+      expect(names[0].textContent.trim()).toContain('Obszar');
+      expect(names[1].textContent.trim()).toContain('Obszar');
+      expect(names[2].textContent.trim()).toContain('Obszar');
     });
 
     it('should display date using relativeTime pipe', () => {
