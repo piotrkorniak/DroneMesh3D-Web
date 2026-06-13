@@ -1,5 +1,5 @@
 import * as fc from 'fast-check';
-import { computeKeyboardNav } from './list-keyboard-nav.directive';
+import { computeKeyboardNav } from './list-keyboard-nav';
 
 // Feature: drone-mesh-gui, Property 5: Keyboard list navigation cycles correctly
 

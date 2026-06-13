@@ -1,5 +1,5 @@
 /**
- * ListKeyboardNavDirective — provides reusable keyboard navigation logic
+ * List keyboard navigation utility — provides reusable keyboard navigation logic
  * for ARIA listbox patterns.
  *
  * Encapsulates the cycling arithmetic:

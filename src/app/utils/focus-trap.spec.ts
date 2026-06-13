@@ -1,5 +1,5 @@
 import * as fc from 'fast-check';
-import { computeFocusTrap } from './focus-trap.directive';
+import { computeFocusTrap } from './focus-trap';
 
 // Feature: drone-mesh-gui, Property 8: Focus trap cycles within modal boundaries
 
