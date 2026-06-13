@@ -33,4 +33,8 @@ export class AreasApiService {
   deleteArea(id: string): Observable<void> {
     return this.http.delete<void>(`${this.basePath}/areas/${id}`);
   }
+
+  updateName(id: string, name: string | null): Observable<AreaResponse> {
+    return this.http.patch<AreaResponse>(`${this.basePath}/areas/${id}`, { name });
+  }
 }

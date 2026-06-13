@@ -56,7 +56,7 @@ describe('FlightPlanFormComponent', () => {
   });
 
   // --- Test 2: Switching to Poi mode shows 9 fields ---
-  it('should show 9 fields when switching to Poi mode', () => {
+  it('should show 3 primary fields when switching to Poi mode', () => {
     selectionState.selectedAreaId.set('area-1');
     fixture.detectChanges();
 
@@ -65,7 +65,7 @@ describe('FlightPlanFormComponent', () => {
 
     expect(component.mode()).toBe('Poi');
     const fields = fixture.nativeElement.querySelectorAll('.fpf__field');
-    expect(fields.length).toBe(9);
+    expect(fields.length).toBe(3);
   });
 
   // --- Test 3: Form is disabled (has fpf--disabled class) when no area is selected ---

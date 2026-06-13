@@ -24,6 +24,15 @@
         </button>
       }
       @case ('polygon-ready') {
+        <input
+          class="area-toolbar__name-input"
+          type="text"
+          placeholder="Nazwa obszaru (opcjonalna)"
+          maxlength="50"
+          aria-label="Nazwa obszaru"
+          [value]="drawingService.areaName()"
+          (input)="onNameInput($event)"
+        />
         <button class="area-toolbar__btn area-toolbar__btn--submit" [disabled]="!drawingService.isValid()" aria-label="Zapisz" (click)="onSubmitArea()">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
             <path d="M4 9l4 4 6-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />

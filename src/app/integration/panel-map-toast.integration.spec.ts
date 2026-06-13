@@ -63,6 +63,8 @@ describe('Integration: Panel–Map–Toast interaction flow', () => {
       const mockArea: AreaResponse = {
         id: 'area-1',
         createdAt: '2024-01-15T10:00:00Z',
+        name: null,
+        sequentialNumber: 1,
         geometry: {
           type: 'Polygon',
           coordinates: [
@@ -102,6 +104,8 @@ describe('Integration: Panel–Map–Toast interaction flow', () => {
       const mockArea: AreaResponse = {
         id: 'area-abc',
         createdAt: '2024-06-01T08:00:00Z',
+        name: null,
+        sequentialNumber: 1,
         geometry: {
           type: 'Polygon',
           coordinates: [

@@ -20,6 +20,8 @@ describe('AreaListComponent', () => {
     {
       id: 'area-1',
       createdAt: '2024-01-15T10:00:00Z',
+      name: null,
+      sequentialNumber: 1,
       geometry: {
         type: 'Polygon',
         coordinates: [
@@ -36,6 +38,8 @@ describe('AreaListComponent', () => {
     {
       id: 'area-2',
       createdAt: '2024-01-16T12:00:00Z',
+      name: null,
+      sequentialNumber: 1,
       geometry: {
         type: 'Polygon',
         coordinates: [
@@ -52,6 +56,8 @@ describe('AreaListComponent', () => {
     {
       id: 'area-3',
       createdAt: '2024-01-14T08:00:00Z',
+      name: null,
+      sequentialNumber: 1,
       geometry: {
         type: 'Polygon',
         coordinates: [
@@ -114,11 +120,11 @@ describe('AreaListComponent', () => {
       expect(items.length).toBe(3);
     });
 
-    it('should display sequential number on each area item', () => {
-      const numbers = fixture.nativeElement.querySelectorAll('.area-list__number');
-      expect(numbers[0].textContent.trim()).toBe('1.');
-      expect(numbers[1].textContent.trim()).toBe('2.');
-      expect(numbers[2].textContent.trim()).toBe('3.');
+    it('should display area name on each area item', () => {
+      const names = fixture.nativeElement.querySelectorAll('.area-list__name');
+      expect(names[0].textContent.trim()).toContain('Obszar');
+      expect(names[1].textContent.trim()).toContain('Obszar');
+      expect(names[2].textContent.trim()).toContain('Obszar');
     });
 
     it('should display date using relativeTime pipe', () => {

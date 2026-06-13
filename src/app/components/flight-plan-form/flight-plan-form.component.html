@@ -48,99 +48,135 @@
           }
         </select>
       </div>
-    }
 
-    @for (field of activeFields(); track field.id) {
-      <div class="fpf__field">
-        <div class="fpf__label-row">
-          <label [for]="'fpf-' + field.id" class="fpf__label">
-            {{ field.label }}
-            @if (field.required) {
-              <span class="fpf__required" aria-hidden="true">*</span>
-            }
-          </label>
+      @for (field of activeFields(); track field.id) {
+        <ng-container *ngTemplateOutlet="fieldTpl; context: { $implicit: field }" />
+      }
+    } @else {
+      <!-- POI mode: orbit shape info + center info -->
+      <div class="fpf__poi-info">
+        <span class="fpf__orbit-shape">{{ orbitShapeLabel() }}</span>
+        @if (poiState.hasCenter()) {
+          <span class="fpf__center-info">Centrum: {{ poiState.centerLat() }}°, {{ poiState.centerLon() }}°</span>
+        } @else {
+          <span class="fpf__center-info fpf__center-info--empty">Kliknij na mapę aby ustawić centrum</span>
+        }
+      </div>
+
+      <!-- POI Warnings -->
+      @if (poiValidation.warnings().length > 0) {
+        <div class="fpf__warnings" role="status" aria-live="polite">
+          @for (warning of poiValidation.warnings(); track warning) {
+            <div class="fpf__warning">⚠ {{ warning }}</div>
+          }
+        </div>
+      }
+
+      <!-- Primary POI fields -->
+      @for (field of poiPrimaryFields(); track field.id) {
+        <ng-container *ngTemplateOutlet="fieldTpl; context: { $implicit: field }" />
+      }
+
+      <!-- Advanced section -->
+      <button type="button" class="fpf__advanced-toggle" (click)="toggleAdvanced()">
+        {{ advancedExpanded() ? '▾ Ukryj zaawansowane' : '▸ Zaawansowane' }}
+      </button>
+      @if (advancedExpanded()) {
+        @for (field of poiAdvancedFields(); track field.id) {
+          <ng-container *ngTemplateOutlet="fieldTpl; context: { $implicit: field }" />
+        }
+      }
+    }
+  </div>
+
+  <!-- Reusable field template -->
+  <ng-template #fieldTpl let-field>
+    <div class="fpf__field">
+      <div class="fpf__label-row">
+        <label [for]="'fpf-' + field.id" class="fpf__label">
+          {{ field.label }}
+          @if (field.required) {
+            <span class="fpf__required" aria-hidden="true">*</span>
+          }
+        </label>
+        <button
+          type="button"
+          class="fpf__tooltip-icon"
+          [attr.aria-label]="'Informacja: ' + field.label"
+          [attr.aria-describedby]="'fpf-tooltip-' + field.id"
+          tabindex="0"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" />
+            <text x="8" y="12" text-anchor="middle" font-size="10" fill="currentColor">?</text>
+          </svg>
+          <span [id]="'fpf-tooltip-' + field.id" class="fpf__tooltip-text" role="tooltip">{{ field.tooltip }}</span>
+        </button>
+      </div>
+
+      @if (field.useSlider) {
+        <div class="fpf__slider-row">
+          <input
+            [id]="'fpf-' + field.id"
+            type="range"
+            class="fpf__slider"
+            [formControlName]="field.id"
+            [min]="field.min"
+            [max]="field.max"
+            [step]="field.step || 1"
+            [attr.aria-describedby]="getAriaDescribedBy(field.id)"
+            [attr.aria-valuemin]="field.min"
+            [attr.aria-valuemax]="field.max"
+            [attr.aria-valuenow]="activeForm().get(field.id)?.value"
+          />
+          <span class="fpf__slider-value">{{ activeForm().get(field.id)?.value ?? '–' }}</span>
+        </div>
+      } @else if (field.useCompass) {
+        <div class="fpf__compass" role="group" [attr.aria-label]="field.label">
           <button
             type="button"
-            class="fpf__tooltip-icon"
-            [attr.aria-label]="'Informacja: ' + field.label"
-            [attr.aria-describedby]="'fpf-tooltip-' + field.id"
-            tabindex="0"
+            class="fpf__compass-btn"
+            [class.fpf__compass-btn--active]="getHeadingValue() === null"
+            [disabled]="!hasSelectedArea()"
+            (click)="setHeading(null)"
+            title="Automatyczny (optymalny)"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" />
-              <text x="8" y="12" text-anchor="middle" font-size="10" fill="currentColor">?</text>
-            </svg>
-            <span [id]="'fpf-tooltip-' + field.id" class="fpf__tooltip-text" role="tooltip">{{ field.tooltip }}</span>
+            Auto
           </button>
-        </div>
-
-        <!-- Slider fields -->
-        @if (field.useSlider) {
-          <div class="fpf__slider-row">
-            <input
-              [id]="'fpf-' + field.id"
-              type="range"
-              class="fpf__slider"
-              [formControlName]="field.id"
-              [min]="field.min"
-              [max]="field.max"
-              [step]="field.step || 1"
-              [attr.aria-describedby]="getAriaDescribedBy(field.id)"
-              [attr.aria-valuemin]="field.min"
-              [attr.aria-valuemax]="field.max"
-              [attr.aria-valuenow]="activeForm().get(field.id)?.value"
-            />
-            <span class="fpf__slider-value">{{ activeForm().get(field.id)?.value ?? '–' }}</span>
-          </div>
-        } @else if (field.useCompass) {
-          <!-- Compass direction selector -->
-          <div class="fpf__compass" role="group" [attr.aria-label]="field.label">
+          @for (dir of compassDirections; track dir.label) {
             <button
               type="button"
               class="fpf__compass-btn"
-              [class.fpf__compass-btn--active]="getHeadingValue() === null"
+              [class.fpf__compass-btn--active]="getHeadingValue() === dir.value"
               [disabled]="!hasSelectedArea()"
-              (click)="setHeading(null)"
-              title="Automatyczny (optymalny)"
+              (click)="setHeading(dir.value)"
+              [title]="dir.label + ' (' + dir.value + '°)'"
             >
-              Auto
+              {{ dir.label }}
             </button>
-            @for (dir of compassDirections; track dir.label) {
-              <button
-                type="button"
-                class="fpf__compass-btn"
-                [class.fpf__compass-btn--active]="getHeadingValue() === dir.value"
-                [disabled]="!hasSelectedArea()"
-                (click)="setHeading(dir.value)"
-                [title]="dir.label + ' (' + dir.value + '°)'"
-              >
-                {{ dir.label }}
-              </button>
-            }
-          </div>
-        } @else {
-          <!-- Regular number input -->
-          <input
-            [id]="'fpf-' + field.id"
-            type="number"
-            class="fpf__input"
-            [class.fpf__input--invalid]="isFieldInvalid(field.id)"
-            [class.fpf__input--readonly]="mode() === 'Grid' && isCameraField(field.id) && cameraFieldsReadonly()"
-            [formControlName]="field.id"
-            [attr.aria-describedby]="getAriaDescribedBy(field.id)"
-            [attr.aria-invalid]="isFieldInvalid(field.id)"
-            [attr.aria-required]="field.required"
-            [readonly]="mode() === 'Grid' && isCameraField(field.id) && cameraFieldsReadonly()"
-            (blur)="markFieldTouched(field.id)"
-          />
-        }
+          }
+        </div>
+      } @else {
+        <input
+          [id]="'fpf-' + field.id"
+          type="number"
+          class="fpf__input"
+          [class.fpf__input--invalid]="isFieldInvalid(field.id)"
+          [class.fpf__input--readonly]="mode() === 'Grid' && isCameraField(field.id) && cameraFieldsReadonly()"
+          [formControlName]="field.id"
+          [attr.aria-describedby]="getAriaDescribedBy(field.id)"
+          [attr.aria-invalid]="isFieldInvalid(field.id)"
+          [attr.aria-required]="field.required"
+          [readonly]="mode() === 'Grid' && isCameraField(field.id) && cameraFieldsReadonly()"
+          (blur)="markFieldTouched(field.id)"
+        />
+      }
 
-        @if (isFieldInvalid(field.id)) {
-          <span [id]="'fpf-error-' + field.id" class="fpf__error" role="alert">{{ getFieldError(field.id) }}</span>
-        }
-      </div>
-    }
-  </div>
+      @if (isFieldInvalid(field.id)) {
+        <span [id]="'fpf-error-' + field.id" class="fpf__error" role="alert">{{ getFieldError(field.id) }}</span>
+      }
+    </div>
+  </ng-template>
 
   <!-- Submit button -->
   <button type="submit" class="fpf__submit" [disabled]="!hasSelectedArea() || submitting()">

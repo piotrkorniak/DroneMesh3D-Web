@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AreaResponse } from '../../api/models/area-response';
 import { AreasApiService } from '../../api/services/areas.service';
 import { FlightPlansApiService } from '../../api/services/flight-plans.service';
@@ -20,7 +21,7 @@ import { sortByCreatedAtDesc } from '../../utils/sort-by-date';
   selector: 'app-area-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RelativeTimePipe, SkeletonComponent, EmptyStateComponent, ConfirmationDialogComponent],
+  imports: [FormsModule, RelativeTimePipe, SkeletonComponent, EmptyStateComponent, ConfirmationDialogComponent],
   templateUrl: './area-list.component.html',
   styleUrl: './area-list.component.scss',
 })
@@ -90,6 +91,10 @@ export class AreaListComponent implements OnInit {
   readonly deleteError = signal<string | null>(null);
   readonly deleteTargetArea = signal<AreaResponse | null>(null);
   readonly deletePlanCount = signal(0);
+
+  /** Inline name editing state */
+  readonly editingAreaId = signal<string | null>(null);
+  readonly editingName = signal('');
 
   /** Computed dialog message including cascade warning */
   readonly deleteDialogMessage = computed(() => {
@@ -209,6 +214,45 @@ export class AreaListComponent implements OnInit {
   /** Clear the delete error (on next user action) */
   clearDeleteError(): void {
     this.deleteError.set(null);
+  }
+
+  getAreaLabel(area: AreaResponse): string {
+    return area.name ?? `Obszar ${area.sequentialNumber}`;
+  }
+
+  startEditing(area: AreaResponse, event: Event): void {
+    event.stopPropagation();
+    this.editingAreaId.set(area.id);
+    this.editingName.set(area.name ?? '');
+  }
+
+  saveEdit(area: AreaResponse): void {
+    const name = this.editingName().trim() || null;
+    this.editingAreaId.set(null);
+    if (name === area.name) return;
+
+    this.areasApi.updateName(area.id, name).subscribe({
+      next: (updated) => {
+        this.selectionState.areas.update((areas) => areas.map((a) => (a.id === updated.id ? updated : a)));
+      },
+      error: () => {
+        this.deleteError.set('Nie udało się zmienić nazwy');
+      },
+    });
+  }
+
+  cancelEdit(): void {
+    this.editingAreaId.set(null);
+  }
+
+  onEditKeydown(event: KeyboardEvent, area: AreaResponse): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.saveEdit(area);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.cancelEdit();
+    }
   }
 
   onKeydown(event: KeyboardEvent): void {

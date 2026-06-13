@@ -53,6 +53,7 @@ describe('AreaToolbarComponent', () => {
       setPolygonCoordinates: jasmine.createSpy('setPolygonCoordinates'),
       drawnCoordinates: signal<number[][] | null>(null).asReadonly(),
       validationResult: signal(null).asReadonly(),
+      areaName: signal(''),
     } as unknown as typeof mockDrawingService;
 
     await TestBed.configureTestingModule({

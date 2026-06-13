@@ -25,6 +25,10 @@ export class AreaToolbarComponent {
     this.drawingService.clearPolygon();
   }
 
+  onNameInput(event: Event): void {
+    this.drawingService.areaName.set((event.target as HTMLInputElement).value);
+  }
+
   onSubmitArea(): void {
     this.drawingService.submitArea().subscribe({
       error: (err) => {

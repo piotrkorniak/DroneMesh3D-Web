@@ -1,8 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgTemplateOutlet } from '@angular/common';
 import { SelectionStateService } from '../../services/selection-state.service';
 import { FlightPlansApiService } from '../../api/services/flight-plans.service';
 import { ToastService } from '../../services/toast.service';
+import { PoiStateService, OrbitShape } from '../../services/poi-state.service';
+import { PoiValidationService } from '../../services/poi-validation.service';
+import { GeometryClassifierService } from '../../services/geometry-classifier.service';
 import { rangeValidator } from '../../utils/range-validator';
 import { FlightMode } from '../../api/models/flight-mode';
 import { CalculateFlightPathRequest } from '../../api/models/calculate-flight-path-request';
@@ -207,11 +212,14 @@ const POI_FIELDS: FieldMeta[] = [
   },
 ];
 
+const POI_PRIMARY_FIELD_IDS = ['radiusM', 'altitudeM', 'photoCount'];
+const POI_ADVANCED_FIELD_IDS = ['overlapPercent', 'cameraHorizontalFovDegrees', 'structureHeightM', 'gimbalPitchDegrees'];
+
 @Component({
   selector: 'app-flight-plan-form',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgTemplateOutlet],
   templateUrl: './flight-plan-form.component.html',
   styleUrl: './flight-plan-form.component.scss',
 })
@@ -219,6 +227,9 @@ export class FlightPlanFormComponent {
   private readonly selectionState = inject(SelectionStateService);
   private readonly flightPlansApi = inject(FlightPlansApiService);
   private readonly toastService = inject(ToastService);
+  readonly poiState = inject(PoiStateService);
+  readonly poiValidation = inject(PoiValidationService);
+  private readonly geometryClassifier = inject(GeometryClassifierService);
 
   /** Current flight mode */
   readonly mode = signal<FlightMode>('Grid');
@@ -231,6 +242,12 @@ export class FlightPlanFormComponent {
 
   /** Fields metadata for the current mode */
   readonly activeFields = computed(() => (this.mode() === 'Grid' ? GRID_FIELDS : POI_FIELDS));
+
+  /** POI primary fields (always visible) */
+  readonly poiPrimaryFields = computed(() => POI_FIELDS.filter((f) => POI_PRIMARY_FIELD_IDS.includes(f.id)));
+
+  /** POI advanced fields (collapsible) */
+  readonly poiAdvancedFields = computed(() => POI_FIELDS.filter((f) => POI_ADVANCED_FIELD_IDS.includes(f.id)));
 
   /** Camera presets list */
   readonly cameraPresets = CAMERA_PRESETS;
@@ -268,9 +285,24 @@ export class FlightPlanFormComponent {
   /** Track which fields have been touched (for showing errors on blur) */
   private readonly touchedFields = signal<Set<string>>(new Set());
 
+  /** Whether advanced POI params are expanded */
+  readonly advancedExpanded = signal(false);
+
+  /** Detected orbit shape label */
+  readonly orbitShapeLabel = computed(() => {
+    const shape = this.poiState.orbitShape();
+    switch (shape) {
+      case 'circular':
+        return 'Orbita: kołowa';
+      case 'rectangular':
+        return 'Orbita: prostokątna';
+      case 'polygon-following':
+        return 'Orbita: dopasowana do konturu';
+    }
+  });
+
   constructor() {
     // Programmatically enable/disable forms based on area selection
-    // This avoids mixing [disabled] attribute with reactive form directives
     effect(() => {
       const enabled = this.hasSelectedArea();
       const opts = { emitEvent: false };
@@ -282,6 +314,83 @@ export class FlightPlanFormComponent {
         this.poiForm.disable(opts);
       }
     });
+
+    // Sync POI mode active state
+    effect(() => {
+      if (this.mode() === 'Poi' && this.hasSelectedArea()) {
+        this.poiState.activate();
+      } else {
+        this.poiState.deactivate();
+      }
+    });
+
+    // Auto-center from centroid when entering POI mode
+    effect(() => {
+      if (this.mode() !== 'Poi') return;
+      if (this.poiState.isManualCenter()) return;
+      const area = this.selectionState.selectedArea();
+      if (!area?.geometry?.coordinates?.[0]) return;
+      const coords = area.geometry.coordinates[0];
+      const result = this.geometryClassifier.classify(coords);
+      this.poiState.setCenterFromCentroid(result.centroid[1], result.centroid[0]);
+      if (!this.poiState.isManualShape()) {
+        const shape = result.shape === 'irregular' ? 'polygon-following' : result.shape;
+        this.poiState.setOrbitShape(shape as OrbitShape);
+      }
+    });
+
+    // Sync radius from form to PoiStateService
+    this.poiForm
+      .get('radiusM')!
+      .valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((val) => {
+        if (this.mode() === 'Poi' && val && Number(val) > 0) {
+          this.poiState.setRadius(Number(val));
+        }
+      });
+
+    // Sync center from PoiStateService to form
+    effect(() => {
+      const lat = this.poiState.centerLat();
+      const lon = this.poiState.centerLon();
+      if (lat !== null && lon !== null) {
+        this.poiForm.patchValue({ centerLatitude: lat, centerLongitude: lon }, { emitEvent: false });
+      }
+    });
+
+    // Task 6.2: Mutual exclusion — photoCount vs overlap/FOV
+    this.poiForm
+      .get('photoCount')!
+      .valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((val) => {
+        const overlap = this.poiForm.get('overlapPercent');
+        const fov = this.poiForm.get('cameraHorizontalFovDegrees');
+        if (val && Number(val) >= 1 && Number(val) <= 1000) {
+          overlap?.disable({ emitEvent: false });
+          fov?.disable({ emitEvent: false });
+        } else {
+          overlap?.enable({ emitEvent: false });
+          fov?.enable({ emitEvent: false });
+        }
+      });
+
+    // Task 6.3: Auto gimbalPitch from structureHeight
+    this.poiForm
+      .get('structureHeightM')!
+      .valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((val) => {
+        const gimbal = this.poiForm.get('gimbalPitchDegrees');
+        if (val && Number(val) > 0) {
+          const alt = Number(this.poiForm.get('altitudeM')?.value || 80);
+          const radius = Number(this.poiForm.get('radiusM')?.value || 50);
+          const pitch = -Math.atan2(alt - Number(val), radius) * (180 / Math.PI);
+          const clamped = Math.max(-90, Math.min(-45, pitch));
+          gimbal?.setValue(Math.round(clamped), { emitEvent: false });
+          gimbal?.disable({ emitEvent: false });
+        } else {
+          gimbal?.enable({ emitEvent: false });
+        }
+      });
   }
 
   /** Check if a field is a camera field */
@@ -318,6 +427,11 @@ export class FlightPlanFormComponent {
   setMode(newMode: FlightMode): void {
     this.mode.set(newMode);
     this.touchedFields.set(new Set());
+    this.advancedExpanded.set(false);
+  }
+
+  toggleAdvanced(): void {
+    this.advancedExpanded.update((v) => !v);
   }
 
   markFieldTouched(fieldId: string): void {
