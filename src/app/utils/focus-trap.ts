@@ -1,5 +1,5 @@
 /**
- * FocusTrapDirective — provides reusable focus trap logic for modal dialogs.
+ * Focus trap utility — provides reusable focus trap logic for modal dialogs.
  *
  * Encapsulates the cycling arithmetic for focus within modal boundaries:
  * - Tab at last focusable element: wraps to first (index 0)

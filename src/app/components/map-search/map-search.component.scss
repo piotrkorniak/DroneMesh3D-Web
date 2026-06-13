@@ -132,3 +132,35 @@
     border-right-color: var(--ds-color-primary);
   }
 }
+
+/* Mobile: search bar adapts */
+@media (max-width: 767px) {
+  :host {
+    top: 8px;
+    width: auto;
+    left: 12px;
+    right: 12px;
+    transform: none;
+    max-width: none;
+  }
+
+  .map-search__input {
+    padding: var(--ds-spacing-sm);
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+
+  .map-search__search-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .map-search__dropdown {
+    max-height: 180px;
+  }
+
+  .map-search__result {
+    padding: var(--ds-spacing-sm) var(--ds-spacing-md);
+    min-height: 44px;
+    justify-content: center;
+  }
+}

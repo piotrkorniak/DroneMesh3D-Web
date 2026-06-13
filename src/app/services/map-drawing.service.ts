@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Observable, tap, finalize } from 'rxjs';
-import { AreaService } from './area.service';
+import { AreasApiService } from '../api/services/areas.service';
 import { SelectionStateService } from './selection-state.service';
 import { PolygonValidatorService } from './polygon-validator.service';
 import { ValidationResult } from '../models/validation';
@@ -9,7 +9,7 @@ import { CreateAreaRequest } from '../api/models/create-area-request';
 
 @Injectable({ providedIn: 'root' })
 export class MapDrawingService {
-  private readonly areaService = inject(AreaService);
+  private readonly areasApi = inject(AreasApiService);
   private readonly selectionState = inject(SelectionStateService);
   private readonly polygonValidator = inject(PolygonValidatorService);
 
@@ -90,7 +90,7 @@ export class MapDrawingService {
 
     this.isSubmitting.set(true);
 
-    return this.areaService.createArea(request).pipe(
+    return this.areasApi.createArea({ body: request }).pipe(
       tap((response) => {
         // Prepend the new area to the cached list
         this.selectionState.areas.update((areas) => [response, ...areas]);

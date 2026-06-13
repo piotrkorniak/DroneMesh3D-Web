@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { MapDrawingService } from './map-drawing.service';
-import { AreaService } from './area.service';
+import { AreasApiService } from '../api/services/areas.service';
 import { SelectionStateService } from './selection-state.service';
 import { PolygonValidatorService } from './polygon-validator.service';
 import { ValidationResult } from '../models/validation';
@@ -10,7 +10,7 @@ import { AreaResponse } from '../api/models/area-response';
 
 describe('MapDrawingService', () => {
   let service: MapDrawingService;
-  let areaServiceSpy: jasmine.SpyObj<AreaService>;
+  let areasApiSpy: jasmine.SpyObj<AreasApiService>;
   let selectionState: SelectionStateService;
   let polygonValidatorSpy: jasmine.SpyObj<PolygonValidatorService>;
 
@@ -33,14 +33,14 @@ describe('MapDrawingService', () => {
   };
 
   beforeEach(() => {
-    areaServiceSpy = jasmine.createSpyObj('AreaService', ['createArea']);
+    areasApiSpy = jasmine.createSpyObj('AreasApiService', ['createArea']);
     polygonValidatorSpy = jasmine.createSpyObj('PolygonValidatorService', ['validate']);
 
     TestBed.configureTestingModule({
       providers: [
         MapDrawingService,
         SelectionStateService,
-        { provide: AreaService, useValue: areaServiceSpy },
+        { provide: AreasApiService, useValue: areasApiSpy },
         { provide: PolygonValidatorService, useValue: polygonValidatorSpy },
       ],
     });
@@ -251,37 +251,39 @@ describe('MapDrawingService', () => {
     });
 
     it('should set isSubmitting to true', () => {
-      areaServiceSpy.createArea.and.returnValue(of(mockResponse));
+      areasApiSpy.createArea.and.returnValue(of(mockResponse));
       service.submitArea().subscribe();
       // isSubmitting is set to true before the observable completes, but finalize resets it
       // After subscribe completes synchronously with `of()`, it's already finalized
       expect(service.isSubmitting()).toBeFalse(); // finalize already ran
     });
 
-    it('should call areaService.createArea with correct request', () => {
-      areaServiceSpy.createArea.and.returnValue(of(mockResponse));
+    it('should call areasApi.createArea with correct request', () => {
+      areasApiSpy.createArea.and.returnValue(of(mockResponse));
       service.submitArea().subscribe();
-      expect(areaServiceSpy.createArea).toHaveBeenCalledWith({
-        type: 'Polygon',
-        coordinates: [validCoords],
+      expect(areasApiSpy.createArea).toHaveBeenCalledWith({
+        body: {
+          type: 'Polygon',
+          coordinates: [validCoords],
+        },
       });
     });
 
     it('should prepend new area to selection state areas on success', () => {
       selectionState.areas.set([]);
-      areaServiceSpy.createArea.and.returnValue(of(mockResponse));
+      areasApiSpy.createArea.and.returnValue(of(mockResponse));
       service.submitArea().subscribe();
       expect(selectionState.areas()[0]).toEqual(mockResponse);
     });
 
     it('should select the new area on success', () => {
-      areaServiceSpy.createArea.and.returnValue(of(mockResponse));
+      areasApiSpy.createArea.and.returnValue(of(mockResponse));
       service.submitArea().subscribe();
       expect(selectionState.selectedAreaId()).toBe('new-area-1');
     });
 
     it('should reset drawing state on success', () => {
-      areaServiceSpy.createArea.and.returnValue(of(mockResponse));
+      areasApiSpy.createArea.and.returnValue(of(mockResponse));
       service.submitArea().subscribe();
       expect(service.hasPolygon()).toBeFalse();
       expect(service.drawnCoordinates()).toBeNull();
@@ -289,13 +291,13 @@ describe('MapDrawingService', () => {
     });
 
     it('should set isSubmitting to false after completion', () => {
-      areaServiceSpy.createArea.and.returnValue(of(mockResponse));
+      areasApiSpy.createArea.and.returnValue(of(mockResponse));
       service.submitArea().subscribe();
       expect(service.isSubmitting()).toBeFalse();
     });
 
     it('should set isSubmitting to false on error', () => {
-      areaServiceSpy.createArea.and.returnValue(throwError(() => new Error('Network error')));
+      areasApiSpy.createArea.and.returnValue(throwError(() => new Error('Network error')));
       service.submitArea().subscribe({
         error: () => {
           /* expected error */
@@ -305,7 +307,7 @@ describe('MapDrawingService', () => {
     });
 
     it('should not clear polygon state on error', () => {
-      areaServiceSpy.createArea.and.returnValue(throwError(() => new Error('Network error')));
+      areasApiSpy.createArea.and.returnValue(throwError(() => new Error('Network error')));
       service.submitArea().subscribe({
         error: () => {
           /* expected error */
@@ -316,7 +318,7 @@ describe('MapDrawingService', () => {
     });
 
     it('should set toolbarState to idle after successful submit', () => {
-      areaServiceSpy.createArea.and.returnValue(of(mockResponse));
+      areasApiSpy.createArea.and.returnValue(of(mockResponse));
       service.submitArea().subscribe();
       expect(service.toolbarState()).toBe('idle');
     });

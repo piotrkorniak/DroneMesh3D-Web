@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FlightPlansApiService } from '../../api/services/flight-plans.service';
 import { SelectionStateService } from '../../services/selection-state.service';
 import { LiveAnnouncerService } from '../../services/live-announcer.service';
@@ -10,7 +11,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 import { sortByCreatedAtDesc } from '../../utils/sort-by-date';
 import { formatFlightTime } from '../../utils/format-flight-time';
 import { FlightPlanResponse } from '../../api/models/flight-plan-response';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 /**
  * FlightPlanListComponent displays the history of generated flight plans for the selected area.
@@ -47,7 +48,8 @@ export class FlightPlanListComponent {
   /** Expose Math for template usage */
   readonly Math = Math;
 
-  private currentSubscription: Subscription | null = null;
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly cancelLoad$ = new Subject<void>();
 
   readonly activeDescendantId = computed(() => {
     const idx = this.focusedIndex();
@@ -85,22 +87,22 @@ export class FlightPlanListComponent {
     this.focusedIndex.set(-1);
 
     // Cancel previous pending request
-    if (this.currentSubscription) {
-      this.currentSubscription.unsubscribe();
-      this.currentSubscription = null;
-    }
+    this.cancelLoad$.next();
 
-    this.currentSubscription = this.flightPlansApi.list({ areaId }).subscribe({
-      next: (response) => {
-        const sorted = sortByCreatedAtDesc(response);
-        this.selectionState.plans.set(sorted);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set(err?.message || 'Nie udało się pobrać planów lotu');
-        this.loading.set(false);
-      },
-    });
+    this.flightPlansApi
+      .list({ areaId })
+      .pipe(takeUntil(this.cancelLoad$), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const sorted = sortByCreatedAtDesc(response);
+          this.selectionState.plans.set(sorted);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.error.set(err?.message || 'Nie udało się pobrać planów lotu');
+          this.loading.set(false);
+        },
+      });
   }
 
   selectPlan(id: string, index: number): void {

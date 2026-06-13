@@ -28,6 +28,14 @@
   scrollbar-color: var(--ds-color-border) transparent;
 }
 
+// Mobile: let list grow taller in bottom sheet
+@media (max-width: 767px) {
+  :host {
+    max-height: 40vh;
+    max-height: 40dvh;
+  }
+}
+
 .area-list__loading {
   display: flex;
   flex-direction: column;
@@ -200,4 +208,19 @@
   font-family: var(--ds-font-family);
   font-size: var(--ds-font-size-sm);
   color: var(--ds-color-error);
+}
+
+// Mobile: bigger touch targets and always-visible delete button
+@media (max-width: 767px) {
+  .area-list__item {
+    min-height: 56px;
+    padding: var(--ds-spacing-sm) var(--ds-spacing-md);
+  }
+
+  .area-list__delete-btn {
+    width: 36px;
+    height: 36px;
+    opacity: 1;
+    visibility: visible;
+  }
 }

@@ -3,6 +3,7 @@ import { signal, WritableSignal, Signal } from '@angular/core';
 import { of } from 'rxjs';
 import { AreaToolbarComponent } from './area-toolbar.component';
 import { MapDrawingService } from '../../services/map-drawing.service';
+import { ToastService } from '../../services/toast.service';
 
 type ToolbarState = 'idle' | 'drawing' | 'polygon-ready' | 'submitting';
 
@@ -56,7 +57,10 @@ describe('AreaToolbarComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [AreaToolbarComponent],
-      providers: [{ provide: MapDrawingService, useValue: mockDrawingService }],
+      providers: [
+        { provide: MapDrawingService, useValue: mockDrawingService },
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['show']) },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AreaToolbarComponent);

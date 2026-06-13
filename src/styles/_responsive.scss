@@ -50,13 +50,37 @@ $breakpoint-desktop: 1024px;
     touch-action: none; // Let OL handle all touch gestures
   }
 
-  // Ensure minimum tap target size for all interactive elements
+  // Ensure minimum tap target size for interactive elements
+  // Applied globally for coarse pointers (phones, tablets)
   button,
   [role='option'],
   [role='radio'],
   a {
     min-height: 44px;
     min-width: 44px;
+  }
+
+  // Prevent text selection on interactive elements during touch
+  [role='listbox'],
+  [role='option'] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+// ============================================================
+// Safe area insets (notch/rounded corners)
+// ============================================================
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: $breakpoint-tablet - 1) {
+    // Add safe area padding for bottom-sheet panel and FAB
+    .side-panel--mobile {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .side-panel__fab--mobile {
+      bottom: calc(16px + env(safe-area-inset-bottom));
+    }
   }
 }
 
