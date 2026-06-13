@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { SelectionStateService } from '../../services/selection-state.service';
 import { FlightPlansApiService } from '../../api/services/flight-plans.service';
@@ -214,7 +214,6 @@ const POI_FIELDS: FieldMeta[] = [
 
 const POI_PRIMARY_FIELD_IDS = ['radiusM', 'altitudeM', 'photoCount'];
 const POI_ADVANCED_FIELD_IDS = ['overlapPercent', 'cameraHorizontalFovDegrees', 'structureHeightM', 'gimbalPitchDegrees'];
-const POI_HIDDEN_FIELD_IDS = ['centerLatitude', 'centerLongitude'];
 
 @Component({
   selector: 'app-flight-plan-form',
