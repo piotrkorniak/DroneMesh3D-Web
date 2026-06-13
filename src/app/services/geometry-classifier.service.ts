@@ -39,10 +39,12 @@ export class GeometryClassifierService {
   }
 
   private isCircular(verts: number[][]): boolean {
-    // Check bounding box aspect ratio 0.9–1.1
+    // Check bounding box aspect ratio 0.9–1.1 (corrected for latitude)
     const lons = verts.map((v) => v[0]);
     const lats = verts.map((v) => v[1]);
-    const width = Math.max(...lons) - Math.min(...lons);
+    const avgLat = lats.reduce((s, l) => s + l, 0) / lats.length;
+    const cosLat = Math.cos((avgLat * Math.PI) / 180);
+    const width = (Math.max(...lons) - Math.min(...lons)) * cosLat;
     const height = Math.max(...lats) - Math.min(...lats);
     if (width === 0 || height === 0) return false;
     const ratio = width / height;
@@ -55,7 +57,7 @@ export class GeometryClassifierService {
     const tolerance = boundingRadius * 0.1;
 
     return verts.every((v) => {
-      const dist = Math.sqrt((v[0] - cx) ** 2 + (v[1] - cy) ** 2);
+      const dist = Math.sqrt(((v[0] - cx) * cosLat) ** 2 + (v[1] - cy) ** 2);
       return Math.abs(dist - boundingRadius) <= tolerance;
     });
   }

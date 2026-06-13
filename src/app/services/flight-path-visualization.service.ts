@@ -48,10 +48,6 @@ export class FlightPathVisualizationService {
           this.renderFlightPath(plan.waypoints);
         }
         this.fitToFlightPath();
-      } else if (plan && plan.mode === 'Poi') {
-        // POI plan with no waypoints: show only center marker
-        this.clearFlightPath();
-        this.renderPoiCenterOnly(plan);
       } else {
         this.clearFlightPath();
       }
@@ -204,12 +200,4 @@ export class FlightPathVisualizationService {
     });
   }
 
-  /**
-   * Renders only the center marker for a POI plan with no waypoints.
-   */
-  private renderPoiCenterOnly(plan: import('../api/models/flight-plan-response').FlightPlanResponse): void {
-    // If plan has POI parameters with center, show the center marker
-    // For now just clear — center coords would need to come from plan metadata
-    this.clearFlightPath();
-  }
 }

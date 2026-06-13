@@ -22,7 +22,8 @@ export class OrbitPreviewService {
         return this.generateCircle(lon, lat, radius);
       case 'rectangular':
       case 'polygon-following':
-        // For now, use circular approximation; full implementation in task 9
+        // TODO: generate actual rectangular/polygon-offset preview geometry
+        // Currently shows circular approximation — UI displays "preview przybliżony" note
         return this.generateCircle(lon, lat, radius);
     }
   });

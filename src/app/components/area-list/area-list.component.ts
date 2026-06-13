@@ -235,6 +235,9 @@ export class AreaListComponent implements OnInit {
       next: (updated) => {
         this.selectionState.areas.update((areas) => areas.map((a) => (a.id === updated.id ? updated : a)));
       },
+      error: () => {
+        this.deleteError.set('Nie udało się zmienić nazwy');
+      },
     });
   }
 

@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { SelectionStateService } from '../../services/selection-state.service';
 import { FlightPlansApiService } from '../../api/services/flight-plans.service';
@@ -340,11 +341,9 @@ export class FlightPlanFormComponent {
     });
 
     // Sync radius from form to PoiStateService
-    effect(() => {
-      if (this.mode() !== 'Poi') return;
-      const radiusVal = this.poiForm.get('radiusM')?.value;
-      if (radiusVal && Number(radiusVal) > 0) {
-        this.poiState.setRadius(Number(radiusVal));
+    this.poiForm.get('radiusM')!.valueChanges.pipe(takeUntilDestroyed()).subscribe((val) => {
+      if (this.mode() === 'Poi' && val && Number(val) > 0) {
+        this.poiState.setRadius(Number(val));
       }
     });
 
@@ -358,12 +357,10 @@ export class FlightPlanFormComponent {
     });
 
     // Task 6.2: Mutual exclusion — photoCount vs overlap/FOV
-    effect(() => {
-      if (this.mode() !== 'Poi') return;
-      const photoCount = this.poiForm.get('photoCount')?.value;
+    this.poiForm.get('photoCount')!.valueChanges.pipe(takeUntilDestroyed()).subscribe((val) => {
       const overlap = this.poiForm.get('overlapPercent');
       const fov = this.poiForm.get('cameraHorizontalFovDegrees');
-      if (photoCount && Number(photoCount) >= 1 && Number(photoCount) <= 1000) {
+      if (val && Number(val) >= 1 && Number(val) <= 1000) {
         overlap?.disable({ emitEvent: false });
         fov?.disable({ emitEvent: false });
       } else {
@@ -373,14 +370,12 @@ export class FlightPlanFormComponent {
     });
 
     // Task 6.3: Auto gimbalPitch from structureHeight
-    effect(() => {
-      if (this.mode() !== 'Poi') return;
-      const structureHeight = this.poiForm.get('structureHeightM')?.value;
+    this.poiForm.get('structureHeightM')!.valueChanges.pipe(takeUntilDestroyed()).subscribe((val) => {
       const gimbal = this.poiForm.get('gimbalPitchDegrees');
-      if (structureHeight && Number(structureHeight) > 0) {
+      if (val && Number(val) > 0) {
         const alt = Number(this.poiForm.get('altitudeM')?.value || 80);
         const radius = Number(this.poiForm.get('radiusM')?.value || 50);
-        const pitch = -Math.atan2(alt - Number(structureHeight), radius) * (180 / Math.PI);
+        const pitch = -Math.atan2(alt - Number(val), radius) * (180 / Math.PI);
         const clamped = Math.max(-90, Math.min(-45, pitch));
         gimbal?.setValue(Math.round(clamped), { emitEvent: false });
         gimbal?.disable({ emitEvent: false });
