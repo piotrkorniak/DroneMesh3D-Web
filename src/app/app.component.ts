@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { MapComponent } from './components/map/map.component';
 import { SidePanelComponent } from './components/side-panel/side-panel.component';
 import { ToastContainerComponent } from './components/toast-container/toast-container.component';
@@ -18,11 +18,17 @@ export class AppComponent {
   private readonly selectionState = inject(SelectionStateService);
   private readonly liveAnnouncer = inject(LiveAnnouncerService);
 
+  /** Reactive viewport width — updates on window resize */
+  private readonly viewportWidth = signal(typeof window !== 'undefined' ? window.innerWidth : 1024);
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.viewportWidth.set(window.innerWidth);
+  }
+
   /** Whether a modal overlay is currently open (export dialog or mobile side panel) */
   readonly isModalOpen = computed(() => {
-    // Mobile overlay counts as modal
-    const isMobileOverlay = typeof window !== 'undefined' && window.innerWidth < 768 && this.panelState.isExpanded();
-    return isMobileOverlay;
+    return this.viewportWidth() < 768 && this.panelState.isExpanded();
   });
 
   /** Live announcement text for aria-live region */

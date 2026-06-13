@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import * as fc from 'fast-check';
 import { MapDrawingService } from './map-drawing.service';
-import { AreaService } from './area.service';
+import { AreasApiService } from '../api/services/areas.service';
 import { SelectionStateService } from './selection-state.service';
 import { PolygonValidatorService } from './polygon-validator.service';
 import { ValidationResult, ValidationRule } from '../models/validation';
@@ -24,14 +24,14 @@ describe('MapDrawingService - Property Tests', () => {
   ];
 
   beforeEach(() => {
-    const areaServiceSpy = jasmine.createSpyObj('AreaService', ['createArea']);
+    const areasApiSpy = jasmine.createSpyObj('AreasApiService', ['createArea']);
     polygonValidatorSpy = jasmine.createSpyObj('PolygonValidatorService', ['validate']);
 
     TestBed.configureTestingModule({
       providers: [
         MapDrawingService,
         SelectionStateService,
-        { provide: AreaService, useValue: areaServiceSpy },
+        { provide: AreasApiService, useValue: areasApiSpy },
         { provide: PolygonValidatorService, useValue: polygonValidatorSpy },
       ],
     });
