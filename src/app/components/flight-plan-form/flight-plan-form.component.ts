@@ -341,11 +341,14 @@ export class FlightPlanFormComponent {
     });
 
     // Sync radius from form to PoiStateService
-    this.poiForm.get('radiusM')!.valueChanges.pipe(takeUntilDestroyed()).subscribe((val) => {
-      if (this.mode() === 'Poi' && val && Number(val) > 0) {
-        this.poiState.setRadius(Number(val));
-      }
-    });
+    this.poiForm
+      .get('radiusM')!
+      .valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((val) => {
+        if (this.mode() === 'Poi' && val && Number(val) > 0) {
+          this.poiState.setRadius(Number(val));
+        }
+      });
 
     // Sync center from PoiStateService to form
     effect(() => {
@@ -357,32 +360,38 @@ export class FlightPlanFormComponent {
     });
 
     // Task 6.2: Mutual exclusion — photoCount vs overlap/FOV
-    this.poiForm.get('photoCount')!.valueChanges.pipe(takeUntilDestroyed()).subscribe((val) => {
-      const overlap = this.poiForm.get('overlapPercent');
-      const fov = this.poiForm.get('cameraHorizontalFovDegrees');
-      if (val && Number(val) >= 1 && Number(val) <= 1000) {
-        overlap?.disable({ emitEvent: false });
-        fov?.disable({ emitEvent: false });
-      } else {
-        overlap?.enable({ emitEvent: false });
-        fov?.enable({ emitEvent: false });
-      }
-    });
+    this.poiForm
+      .get('photoCount')!
+      .valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((val) => {
+        const overlap = this.poiForm.get('overlapPercent');
+        const fov = this.poiForm.get('cameraHorizontalFovDegrees');
+        if (val && Number(val) >= 1 && Number(val) <= 1000) {
+          overlap?.disable({ emitEvent: false });
+          fov?.disable({ emitEvent: false });
+        } else {
+          overlap?.enable({ emitEvent: false });
+          fov?.enable({ emitEvent: false });
+        }
+      });
 
     // Task 6.3: Auto gimbalPitch from structureHeight
-    this.poiForm.get('structureHeightM')!.valueChanges.pipe(takeUntilDestroyed()).subscribe((val) => {
-      const gimbal = this.poiForm.get('gimbalPitchDegrees');
-      if (val && Number(val) > 0) {
-        const alt = Number(this.poiForm.get('altitudeM')?.value || 80);
-        const radius = Number(this.poiForm.get('radiusM')?.value || 50);
-        const pitch = -Math.atan2(alt - Number(val), radius) * (180 / Math.PI);
-        const clamped = Math.max(-90, Math.min(-45, pitch));
-        gimbal?.setValue(Math.round(clamped), { emitEvent: false });
-        gimbal?.disable({ emitEvent: false });
-      } else {
-        gimbal?.enable({ emitEvent: false });
-      }
-    });
+    this.poiForm
+      .get('structureHeightM')!
+      .valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((val) => {
+        const gimbal = this.poiForm.get('gimbalPitchDegrees');
+        if (val && Number(val) > 0) {
+          const alt = Number(this.poiForm.get('altitudeM')?.value || 80);
+          const radius = Number(this.poiForm.get('radiusM')?.value || 50);
+          const pitch = -Math.atan2(alt - Number(val), radius) * (180 / Math.PI);
+          const clamped = Math.max(-90, Math.min(-45, pitch));
+          gimbal?.setValue(Math.round(clamped), { emitEvent: false });
+          gimbal?.disable({ emitEvent: false });
+        } else {
+          gimbal?.enable({ emitEvent: false });
+        }
+      });
   }
 
   /** Check if a field is a camera field */

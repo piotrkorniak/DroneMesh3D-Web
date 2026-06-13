@@ -199,5 +199,4 @@ export class FlightPathVisualizationService {
       this.flightPathSource.addFeature(pointFeature);
     });
   }
-
 }

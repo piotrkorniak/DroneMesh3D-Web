@@ -31,7 +31,18 @@ describe('PoiValidationService', () => {
       {
         id: '1',
         createdAt: '2024-01-01',
-        geometry: { type: 'Polygon', coordinates: [[[20.0, 52.0], [20.01, 52.0], [20.01, 52.01], [20.0, 52.01], [20.0, 52.0]]] },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [20.0, 52.0],
+              [20.01, 52.0],
+              [20.01, 52.01],
+              [20.0, 52.01],
+              [20.0, 52.0],
+            ],
+          ],
+        },
         name: null,
         sequentialNumber: 1,
       },
@@ -50,7 +61,18 @@ describe('PoiValidationService', () => {
       {
         id: '1',
         createdAt: '2024-01-01',
-        geometry: { type: 'Polygon', coordinates: [[[20.0, 52.0], [20.001, 52.0], [20.001, 52.001], [20.0, 52.001], [20.0, 52.0]]] },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [20.0, 52.0],
+              [20.001, 52.0],
+              [20.001, 52.001],
+              [20.0, 52.001],
+              [20.0, 52.0],
+            ],
+          ],
+        },
         name: null,
         sequentialNumber: 1,
       },

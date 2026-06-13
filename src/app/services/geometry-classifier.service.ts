@@ -11,7 +11,10 @@ export interface ClassificationResult {
 export class GeometryClassifierService {
   classify(coordinates: number[][]): ClassificationResult {
     // Remove closing vertex if duplicated
-    const verts = coordinates.length > 1 && coordinates[0][0] === coordinates[coordinates.length - 1][0] && coordinates[0][1] === coordinates[coordinates.length - 1][1] ? coordinates.slice(0, -1) : coordinates;
+    const verts =
+      coordinates.length > 1 && coordinates[0][0] === coordinates[coordinates.length - 1][0] && coordinates[0][1] === coordinates[coordinates.length - 1][1]
+        ? coordinates.slice(0, -1)
+        : coordinates;
 
     const centroid = this.computeCentroid(verts);
 
