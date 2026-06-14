@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -7,9 +8,9 @@ import { AuthService } from '../../services/auth.service';
     <div class="login-container">
       <h1>DroneMesh3D</h1>
       <p>Sign in to continue</p>
-      <button type="button" (click)="onLogin()" class="google-btn" aria-label="Sign in with Google">
+      <a [href]="loginUrl" class="google-btn" aria-label="Sign in with Google">
         Sign in with Google
-      </button>
+      </a>
     </div>
   `,
   styles: `
@@ -29,6 +30,7 @@ import { AuthService } from '../../services/auth.service';
       background: #4285f4;
       color: white;
       cursor: pointer;
+      text-decoration: none;
     }
     .google-btn:hover {
       background: #357ae8;
@@ -37,13 +39,9 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent implements OnInit {
   readonly auth = inject(AuthService);
+  readonly loginUrl = `${environment.apiUrl}/api/auth/google?returnUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin + '/' : '/')}`;
 
   ngOnInit(): void {
-    console.log('[LOGIN] LoginComponent initialized');
-  }
-
-  onLogin(): void {
-    console.log('[LOGIN] Button clicked!');
-    this.auth.login();
+    console.log('[LOGIN] LoginComponent initialized, loginUrl:', this.loginUrl);
   }
 }
