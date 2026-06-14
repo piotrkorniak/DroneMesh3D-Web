@@ -1,0 +1,137 @@
+.photo-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.file-input-label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+
+  input[type='file'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .file-input-text {
+    padding: 0.5rem 1rem;
+    border: 2px dashed var(--border-color, #ccc);
+    border-radius: 0.5rem;
+    transition: border-color 0.2s;
+
+    &:hover {
+      border-color: var(--primary-color, #3b82f6);
+    }
+  }
+}
+
+.upload-btn {
+  align-self: flex-start;
+  padding: 0.5rem 1.5rem;
+  background: var(--primary-color, #3b82f6);
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:hover {
+    background: var(--primary-hover, #2563eb);
+  }
+}
+
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.overall-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 0.5rem;
+  background: var(--bg-muted, #e5e7eb);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary-color, #3b82f6);
+  transition: width 0.2s;
+}
+
+.progress-text {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  min-width: 3rem;
+}
+
+.status-text {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.success-message {
+  padding: 0.75rem 1rem;
+  background: var(--success-bg, #ecfdf5);
+  color: var(--success-text, #065f46);
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.error-message {
+  padding: 0.75rem 1rem;
+  background: var(--error-bg, #fef2f2);
+  color: var(--error-text, #991b1b);
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.file-list {
+  font-size: 0.8125rem;
+
+  summary {
+    cursor: pointer;
+    color: var(--text-muted, #6b7280);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    max-height: 12rem;
+    overflow-y: auto;
+  }
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+
+  &.done {
+    color: var(--success-text, #065f46);
+  }
+
+  &.error {
+    color: var(--error-text, #991b1b);
+  }
+}
+
+.file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70%;
+}

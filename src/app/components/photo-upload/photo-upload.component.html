@@ -1,0 +1,60 @@
+<div class="photo-upload">
+  <label class="file-input-label">
+    <input
+      type="file"
+      multiple
+      accept="image/jpeg"
+      (change)="onFilesSelected($event)"
+      [disabled]="state() === 'uploading' || state() === 'confirming'"
+      aria-label="Select photos to upload"
+    />
+    <span class="file-input-text">
+      @if (selectedFileCount() > 0) {
+        {{ selectedFileCount() }} photo(s) selected
+      } @else {
+        Choose photos…
+      }
+    </span>
+  </label>
+
+  @if (selectedFileCount() > 0 && state() === 'idle') {
+    <button class="upload-btn" (click)="startUpload()">Upload {{ selectedFileCount() }} photos</button>
+  }
+
+  @if (state() === 'uploading' || state() === 'confirming') {
+    <div class="progress-section">
+      <div class="overall-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="overallProgress()"></div>
+        </div>
+        <span class="progress-text">{{ overallProgress() }}%</span>
+      </div>
+
+      @if (state() === 'confirming') {
+        <p class="status-text">Confirming upload…</p>
+      }
+    </div>
+  }
+
+  @if (state() === 'done' && result()) {
+    <div class="success-message" role="alert">✓ {{ result()!.photoCount }} photos uploaded ({{ formatBytes(result()!.totalSizeBytes) }})</div>
+  }
+
+  @if (state() === 'error' && errorMessage()) {
+    <div class="error-message" role="alert">✗ {{ errorMessage() }}</div>
+  }
+
+  @if (fileProgresses().length > 0 && state() === 'uploading') {
+    <details class="file-list">
+      <summary>File details</summary>
+      <ul>
+        @for (fp of fileProgresses(); track fp.fileName) {
+          <li [class]="'file-item ' + fp.status">
+            <span class="file-name">{{ fp.fileName }}</span>
+            <span class="file-progress">{{ fp.progress }}%</span>
+          </li>
+        }
+      </ul>
+    </details>
+  }
+</div>
