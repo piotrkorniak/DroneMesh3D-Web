@@ -1,5 +1,5 @@
 @if (auth.loading()) {
-  <div class="loading-spinner">Loading...</div>
+  <div class="loading-spinner" aria-busy="true">Loading...</div>
 } @else if (!auth.user()) {
   <app-login />
 } @else {

@@ -13,6 +13,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   readonly user = signal<User | null>(null);
   readonly loading = signal(true);
+  private redirecting = false;
 
   checkAuth(): void {
     this.http.get<User>('/api/auth/me').subscribe({
@@ -28,12 +29,13 @@ export class AuthService {
   }
 
   logout(): void {
-    this.http.post('/api/auth/logout', null).subscribe(() => {
-      this.user.set(null);
-    });
+    this.user.set(null);
+    this.http.post('/api/auth/logout', null).subscribe();
   }
 
   login(): void {
+    if (this.redirecting) return;
+    this.redirecting = true;
     window.location.href = '/api/auth/google?returnUrl=/';
   }
 }

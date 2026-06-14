@@ -3,12 +3,11 @@ import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   template: `
     <div class="login-container">
       <h1>DroneMesh3D</h1>
-      <p>Zaloguj się, aby kontynuować</p>
-      <button (click)="auth.login()" class="google-btn">Zaloguj przez Google</button>
+      <p>Sign in to continue</p>
+      <button type="button" (click)="auth.login()" class="google-btn" aria-label="Sign in with Google">Sign in with Google</button>
     </div>
   `,
   styles: `
