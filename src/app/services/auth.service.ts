@@ -16,12 +16,15 @@ export class AuthService {
   readonly loading = signal(true);
 
   checkAuth(): void {
+    console.log('[AUTH] checkAuth() called, hitting /api/auth/me');
     this.http.get<User>('/api/auth/me').subscribe({
       next: (user) => {
+        console.log('[AUTH] checkAuth() success, user:', user);
         this.user.set(user);
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
+        console.log('[AUTH] checkAuth() failed, status:', err.status);
         this.user.set(null);
         this.loading.set(false);
       },
@@ -29,12 +32,15 @@ export class AuthService {
   }
 
   logout(): void {
+    console.log('[AUTH] logout() called');
     this.user.set(null);
     this.http.post('/api/auth/logout', null).subscribe();
   }
 
   login(): void {
     const returnUrl = encodeURIComponent(window.location.origin + '/');
-    window.location.href = `${environment.apiUrl}/api/auth/google?returnUrl=${returnUrl}`;
+    const url = `${environment.apiUrl}/api/auth/google?returnUrl=${returnUrl}`;
+    console.log('[AUTH] login() called, redirecting to:', url);
+    window.location.href = url;
   }
 }
