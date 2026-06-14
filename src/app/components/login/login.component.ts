@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -7,7 +7,9 @@ import { AuthService } from '../../services/auth.service';
     <div class="login-container">
       <h1>DroneMesh3D</h1>
       <p>Sign in to continue</p>
-      <button type="button" (click)="auth.login()" class="google-btn" aria-label="Sign in with Google">Sign in with Google</button>
+      <button type="button" (click)="onLogin()" class="google-btn" aria-label="Sign in with Google">
+        Sign in with Google
+      </button>
     </div>
   `,
   styles: `
@@ -33,6 +35,15 @@ import { AuthService } from '../../services/auth.service';
     }
   `,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   readonly auth = inject(AuthService);
+
+  ngOnInit(): void {
+    console.log('[LOGIN] LoginComponent initialized');
+  }
+
+  onLogin(): void {
+    console.log('[LOGIN] Button clicked!');
+    this.auth.login();
+  }
 }
