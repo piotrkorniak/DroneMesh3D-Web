@@ -8,9 +8,7 @@ import { environment } from '../../../environments/environment';
     <div class="login-container">
       <h1>DroneMesh3D</h1>
       <p>Sign in to continue</p>
-      <a [href]="loginUrl" class="google-btn" aria-label="Sign in with Google">
-        Sign in with Google
-      </a>
+      <a [href]="loginUrl" class="google-btn" aria-label="Sign in with Google"> Sign in with Google </a>
     </div>
   `,
   styles: `
