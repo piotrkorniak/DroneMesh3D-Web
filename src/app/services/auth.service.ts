@@ -14,7 +14,6 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   readonly user = signal<User | null>(null);
   readonly loading = signal(true);
-  private redirecting = false;
 
   checkAuth(): void {
     this.http.get<User>('/api/auth/me').subscribe({
@@ -35,8 +34,6 @@ export class AuthService {
   }
 
   login(): void {
-    if (this.redirecting) return;
-    this.redirecting = true;
     const returnUrl = encodeURIComponent(window.location.origin + '/');
     window.location.href = `${environment.apiUrl}/api/auth/google?returnUrl=${returnUrl}`;
   }
