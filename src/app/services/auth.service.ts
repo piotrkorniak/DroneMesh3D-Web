@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 export interface User {
   id: string;
@@ -36,6 +37,7 @@ export class AuthService {
   login(): void {
     if (this.redirecting) return;
     this.redirecting = true;
-    window.location.href = '/api/auth/google?returnUrl=/';
+    const returnUrl = encodeURIComponent(window.location.origin + '/');
+    window.location.href = `${environment.apiUrl}/api/auth/google?returnUrl=${returnUrl}`;
   }
 }
